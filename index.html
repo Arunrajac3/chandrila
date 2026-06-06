@@ -942,6 +942,50 @@
 
         .btn-place-order:hover { background: var(--accent-hover); transform: scale(1.02); }
 
+        /* QR CODE BOX */
+        .qr-box {
+            display: none;
+            background: var(--accent-light);
+            border: 1.5px dashed var(--accent);
+            border-radius: 16px;
+            padding: 18px;
+            text-align: center;
+            margin-bottom: 14px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .qr-box.visible { display: block; }
+
+        .qr-box img {
+            width: 180px;
+            height: 180px;
+            border-radius: 10px;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+        }
+
+        .qr-upi-id {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--accent);
+            background: #fff;
+            padding: 6px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--border-color);
+        }
+
+        .qr-note {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
         .btn-back-to-cart {
             width: 100%;
             padding: 10px;
@@ -967,7 +1011,7 @@
             border-radius: 22px;
             padding: 40px 32px;
             width: 100%;
-            max-width: 390px;
+            max-width: 420px;
             text-align: center;
             box-shadow: 0 20px 40px rgba(0,0,0,0.12);
             transform: scale(0.88) translateY(20px);
@@ -1592,12 +1636,22 @@
                 <div class="pay-method-btn selected" id="pm_upi" onclick="selectPayMethod('upi')">
                     <span class="pay-method-icon">📱</span>UPI
                 </div>
+                <div class="pay-method-btn" id="pm_qr" onclick="selectPayMethod('qr')">
+                    <span class="pay-method-icon">📷</span>QR Code
+                </div>
                 <div class="pay-method-btn" id="pm_cod" onclick="selectPayMethod('cod')">
-                    <span class="pay-method-icon">💵</span>Cash on Delivery
+                    <span class="pay-method-icon">💵</span>COD
                 </div>
                 <div class="pay-method-btn" id="pm_card" onclick="selectPayMethod('card')">
                     <span class="pay-method-icon">💳</span>Card
                 </div>
+            </div>
+
+            <!-- QR CODE BOX — shown when QR selected -->
+            <div class="qr-box" id="qrBox">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=rajic2799@oksbi%26pn=Chandrila%26cu=INR" alt="UPI QR Code" />
+                <div class="qr-upi-id">rajic2799@oksbi</div>
+                <div class="qr-note">📲 GPay / PhonePe / Paytm-ல scan பண்ணி pay பண்ணுங்க<br>Pay பண்ணிய பிறகு Place Order பண்ணுங்க</div>
             </div>
             <button class="btn-place-order" onclick="placeOrder()">✅ Place Order</button>
             <button class="btn-back-to-cart" onclick="backToCart()">← Back to Cart</button>
@@ -1985,15 +2039,30 @@
         });
         totalEl.textContent = `Total Payable: ₹${total}`;
         selectedPayMethod = 'upi';
-        ['upi','cod','card'].forEach(m => document.getElementById('pm_' + m).classList.remove('selected'));
+        ['upi','qr','cod','card'].forEach(m => {
+            const el = document.getElementById('pm_' + m);
+            if (el) el.classList.remove('selected');
+        });
         document.getElementById('pm_upi').classList.add('selected');
+        document.getElementById('qrBox').classList.remove('visible');
         setTimeout(() => { document.getElementById('paymentModal').classList.add('active'); }, 200);
     }
 
     function selectPayMethod(method) {
         selectedPayMethod = method;
-        ['upi','cod','card'].forEach(m => document.getElementById('pm_' + m).classList.remove('selected'));
+        ['upi','qr','cod','card'].forEach(m => {
+            const el = document.getElementById('pm_' + m);
+            if (el) el.classList.remove('selected');
+        });
         document.getElementById('pm_' + method).classList.add('selected');
+
+        // Show QR box only when QR selected
+        const qrBox = document.getElementById('qrBox');
+        if (method === 'qr') {
+            qrBox.classList.add('visible');
+        } else {
+            qrBox.classList.remove('visible');
+        }
     }
 
     async function placeOrder() {
@@ -2033,9 +2102,43 @@
         }
 
         closeModal('paymentModal');
-        const methodLabel = { upi: 'UPI', cod: 'Cash on Delivery', card: 'Card' }[selectedPayMethod];
+        const methodLabel = { upi: 'UPI', qr: 'QR Code (UPI)', cod: 'Cash on Delivery', card: 'Card' }[selectedPayMethod];
+
+        // Build WhatsApp message
+        const itemLines = order.items.map(i => `  • ${i.name} — ₹${i.price}`).join('\n');
+        const waMsg = 
+`🌿 *New Order - CHANDRILA*
+
+*Order ID:* ${order.id}
+*Customer:* ${name}
+*Mobile:* ${phone}
+*Email:* ${currentUser ? currentUser.email : 'N/A'}
+
+*Items Ordered:*
+${itemLines}
+
+*Total:* ₹${order.total}
+*Payment:* ${methodLabel}
+
+*Delivery Address:*
+${address}
+
+_Order placed on ${new Date().toLocaleString('en-IN')}_`;
+
+        const waURL = `https://wa.me/917339516699?text=${encodeURIComponent(waMsg)}`;
+
         document.getElementById('successMsg').innerHTML =
-            `Thank you, <strong>${name}</strong>! 🌿<br>Order <strong>#${order.id}</strong> placed via <strong>${methodLabel}</strong>.<br>We'll contact you at <strong>${phone}</strong> shortly.`;
+            `Thank you, <strong>${name}</strong>! 🌿<br>
+             Order <strong>#${order.id}</strong> placed via <strong>${methodLabel}</strong>.<br>
+             We'll contact you at <strong>${phone}</strong> shortly.<br><br>
+             <a href="${waURL}" target="_blank" style="
+                display:inline-flex;align-items:center;gap:8px;
+                background:#25D366;color:#fff;text-decoration:none;
+                padding:10px 22px;border-radius:22px;font-weight:700;
+                font-size:0.95rem;box-shadow:0 4px 12px rgba(37,211,102,0.3);
+                margin-top:4px;">
+                <span style="font-size:1.2rem;">💬</span> Send Order to WhatsApp
+             </a>`;
 
         setTimeout(() => { document.getElementById('successModal').classList.add('active'); }, 200);
         cart = [];
