@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chandrila | Natural Beauty & Wellness — Enquire</title>
+  <meta name="description" content="Chandrila — natural herbal skincare, hair care and wholesome foods. Enquire for products, wholesale and bulk orders." />
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <div class="modal-bg" id="fbModal">
+    <div class="modal-box">
+      <h3 class="font-display text-xl font-bold text-leaf-950 mb-4">Upload Feedback Screenshot</h3>
+      <div class="field"><label>Customer name (optional)</label><input id="fbName" type="text" placeholder="Priya / Customer"></div>
+      <div class="field"><label>Caption (optional)</label><input id="fbCaption" type="text" placeholder="Loved the soap..."></div>
+      <div class="field"><label>WhatsApp screenshot *</label>
+        <div class="img-upload-box" onclick="document.getElementById('fbImageFile').click()">
+          <div style="font-size:.85rem;color:#4d6b56">📸 Upload screenshot</div>
+          <input id="fbImageFile" type="file" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handleFbImage(event)">
+        </div>
+        <img id="fbImagePreview" class="img-preview" style="display:none" alt="">
+        <input type="hidden" id="fbImageData">
+      </div>
+      <div style="display:flex;gap:8px">
+        <button type="button" class="btn-a primary" onclick="saveFeedback()">Save</button>
+        <button type="button" class="btn-a" onclick="closeFbModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            leaf: {
+              950: '#0f3d1c',
+              900: '#1f7a3a',
+              800: '#259d44',
+              100: '#e2f5e8',
+              50: '#f0f7f1',
+            },
+            cream: '#f7f4ef',
+          },
+          fontFamily: {
+            display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+            sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'DM Sans', system-ui, sans-serif; color: #14261a; }
+    .font-display { font-family: 'Cormorant Garamond', Georgia, serif; }
+    .hero-bg {
+      background: linear-gradient(135deg, #c8ebd4 0%, #e2f5e8 40%, #f0f7f1 70%, #d4f0dc 100%);
+      background-size: 200% 200%;
+      animation: heroShift 14s ease infinite;
+    }
+    @keyframes heroShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    .nav-scrolled {
+      background: rgba(255,255,255,0.97);
+      box-shadow: 0 4px 20px rgba(31,122,58,0.08);
+      border-bottom-color: #b8e0c4 !important;
+    }
+    .product-card { transition: transform .25s ease, box-shadow .25s ease; }
+    .product-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -12px rgba(31,122,58,0.18); }
+    /* Admin */
+    .admin-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:100;background:#1f7a3a;border-bottom:2px solid #c9a227;padding:8px 14px;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+    .admin-bar.show{display:flex}
+    .admin-bar .title{color:#fef9c3;font-size:.85rem;font-weight:700}
+    .admin-bar .tabs{display:flex;flex-wrap:wrap;gap:6px}
+    .admin-bar button{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 12px;border-radius:8px;font-size:.78rem;font-weight:600;cursor:pointer;font-family:inherit}
+    .admin-bar button:hover,.admin-bar button.active{background:#fef9c3;border-color:#fef9c3;color:#1f7a3a}
+    #adminPanel{display:none;min-height:100vh;background:#f0f7f1;padding:70px 16px 48px}
+    #adminPanel.show{display:block}
+    #publicSite.hide{display:none}
+    .admin-wrap{max-width:1080px;margin:0 auto}
+    .admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:24px}
+    .admin-stat{background:#fff;border:1px solid #cfe6d4;border-radius:14px;padding:16px}
+    .admin-stat .n{font-size:1.5rem;font-weight:700;color:#0f3d1c;font-family:'Cormorant Garamond',serif}
+    .admin-stat .l{font-size:.75rem;color:#4d6b56;margin-top:2px}
+    .admin-card{background:#fff;border:1px solid #cfe6d4;border-radius:14px;padding:18px;margin-bottom:14px}
+    .admin-card h3{font-size:.95rem;font-weight:700;color:#0f3d1c;margin-bottom:12px}
+    .enq-item{border:1px solid #cfe6d4;border-radius:12px;padding:14px;margin-bottom:10px;background:#fafdfb}
+    .enq-item .meta{font-size:.75rem;color:#4d6b56;margin-bottom:6px}
+    .badge{display:inline-block;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:999px;text-transform:uppercase}
+    .badge-new{background:#fef3c7;color:#b45309}
+    .badge-done{background:#dcfce7;color:#166534}
+    .badge-pending{background:#e0e7ff;color:#3730a3}
+    .badge-rejected{background:#fee2e2;color:#b91c1c}
+    .admin-table{width:100%;border-collapse:collapse;font-size:.85rem}
+    .admin-table th,.admin-table td{text-align:left;padding:10px 8px;border-bottom:1px solid #cfe6d4}
+    .admin-table th{color:#4d6b56;font-size:.72rem;text-transform:uppercase}
+    .btn-a{padding:7px 12px;border-radius:8px;font-size:.75rem;font-weight:600;cursor:pointer;border:1px solid #cfe6d4;background:#fff;color:#0f3d1c;font-family:inherit}
+    .btn-a.primary{background:#1f7a3a;color:#fff;border-color:#1f7a3a}
+    .btn-a.gold{background:#c9a227;color:#fff;border-color:#c9a227}
+    .btn-a.danger{background:#fef2f2;color:#b91c1c;border-color:#fecaca}
+    .btn-a.ok{background:#dcfce7;color:#166534;border-color:#bbf7d0}
+    .field{margin-bottom:12px}
+    .field label{display:block;font-size:.78rem;font-weight:600;color:#0f3d1c;margin-bottom:4px}
+    .field input,.field textarea,.field select{width:100%;padding:9px 12px;border:1px solid #cfe6d4;border-radius:10px;font-size:.9rem;font-family:inherit;background:#fff}
+    .modal-bg{display:none;position:fixed;inset:0;background:rgba(15,61,28,.5);z-index:200;align-items:center;justify-content:center;padding:16px}
+    .modal-bg.show{display:flex}
+    .modal-box{background:#fff;border-radius:16px;padding:24px;max-width:440px;width:100%;max-height:90vh;overflow:auto}
+
+    .fb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+    .fb-card{background:#fff;border:1px solid #cfe6d4;border-radius:14px;overflow:hidden;box-shadow:0 4px 14px rgba(31,122,58,.06)}
+    .fb-card img{width:100%;height:200px;object-fit:cover;display:block;background:#e2f5e8}
+    .fb-card .fb-body{padding:12px 14px}
+    .img-upload-box{border:2px dashed #cfe6d4;border-radius:12px;padding:16px;text-align:center;cursor:pointer;background:#fafdfb}
+    .img-upload-box:hover{border-color:#1f7a3a;background:#e2f5e8}
+    .img-preview{max-width:100%;max-height:140px;border-radius:10px;margin-top:10px;object-fit:cover}
+  </style>
+</head>
+<body class="bg-leaf-50 antialiased">
+
+  <!-- ADMIN BAR -->
+  <div class="admin-bar" id="adminBar">
+    <span class="title">🛠 Chandrila Admin</span>
+    <div class="tabs">
+      <button type="button" class="active" data-tab="dash" onclick="showAdminTab('dash')">Dashboard</button>
+      <button type="button" data-tab="enquiries" onclick="showAdminTab('enquiries')">Enquiries</button>
+      <button type="button" data-tab="products" onclick="showAdminTab('products')">Products</button>
+      <button type="button" data-tab="feedbacks" onclick="showAdminTab('feedbacks')">Feedbacks</button>
+      <button type="button" data-tab="settings" onclick="showAdminTab('settings')">Settings</button>
+      <button type="button" onclick="exitAdmin()">View Site</button>
+      <button type="button" onclick="adminLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div id="publicSite">
+
+  <!-- HEADER -->
+  <header id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white border-b border-leaf-100">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center justify-between h-16 md:h-[70px]">
+        <a href="#home" class="flex flex-col leading-tight">
+          <span class="font-display text-xl md:text-2xl font-bold text-leaf-900 tracking-wide">CHANDRILA</span>
+          <span class="text-[10px] uppercase tracking-[0.18em] text-leaf-900/50 font-semibold">Natural Beauty & Wellness</span>
+        </a>
+        <nav class="hidden lg:flex items-center gap-6">
+          <a href="#home" class="text-sm font-medium text-leaf-950/70 hover:text-leaf-900">Home</a>
+          <a href="#products" class="text-sm font-medium text-leaf-950/70 hover:text-leaf-900">Products</a>
+          <a href="#about" class="text-sm font-medium text-leaf-950/70 hover:text-leaf-900">About</a>
+          <a href="#feedbacks" class="text-sm font-medium text-leaf-950/70 hover:text-leaf-900">Feedbacks</a>
+          <a href="#enquire" class="text-sm font-medium text-leaf-950/70 hover:text-leaf-900">Enquire</a>
+        </nav>
+        <div class="flex items-center gap-2">
+          <a id="headerWa" href="https://wa.me/917339516699" target="_blank" rel="noopener"
+             class="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-[#25D366] hover:bg-[#1ebe57] text-white text-xs sm:text-sm font-semibold shadow transition">
+            WhatsApp
+          </a>
+          <button id="mobileBtn" class="lg:hidden p-2 text-leaf-900" aria-label="Menu">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="mobileMenu" class="hidden lg:hidden border-t border-leaf-100 bg-white">
+      <div class="px-4 py-3 space-y-2">
+        <a href="#home" class="block py-2 text-leaf-950/80">Home</a>
+        <a href="#products" class="block py-2 text-leaf-950/80">Products</a>
+        <a href="#about" class="block py-2 text-leaf-950/80">About</a>
+        <a href="#feedbacks" class="block py-2 text-leaf-950/80">Feedbacks</a>
+        <a href="#enquire" class="block py-2 text-leaf-950/80">Enquire</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section id="home" class="hero-bg pt-24 pb-14 md:pt-32 md:pb-20">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-leaf-900/10 border border-leaf-900/20 mb-5">
+        <span class="w-2 h-2 rounded-full bg-leaf-900 animate-pulse"></span>
+        <span class="text-xs font-semibold text-leaf-900 tracking-wide">100% Natural · Herbal · Chemical-free</span>
+      </div>
+      <h1 class="font-display text-4xl sm:text-5xl md:text-6xl font-bold text-leaf-950 leading-tight mb-4">
+        Natural Beauty<br />for Everyday Rituals
+      </h1>
+      <p class="text-leaf-950/70 text-base sm:text-lg max-w-xl mx-auto mb-8 leading-relaxed">
+        Skin, hair care &amp; wholesome foods — crafted with tradition. Enquire for retail or bulk orders.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <a href="#products" class="inline-flex justify-center px-7 py-3.5 rounded-full bg-leaf-900 hover:bg-leaf-800 text-white font-semibold shadow-lg shadow-leaf-900/25 transition">View Products</a>
+        <a href="#enquire" class="inline-flex justify-center px-7 py-3.5 rounded-full bg-white border border-leaf-900/20 text-leaf-950 font-semibold hover:border-leaf-900 transition">Send Enquiry</a>
+      </div>
+      <div class="mt-10 flex flex-wrap justify-center gap-8 text-sm text-leaf-950/60 font-medium">
+        <span>🌿 100% Natural</span>
+        <span>🧪 Cold Processed</span>
+        <span>🚫 No Parabens</span>
+        <span>📦 Retail &amp; Bulk</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="py-8 bg-white border-b border-leaf-100">
+    <div class="max-w-4xl mx-auto px-4 flex flex-wrap justify-center gap-3 sm:gap-4">
+      <button type="button" onclick="filterCat('all')" class="cat-btn px-4 py-2 rounded-full text-sm font-semibold bg-leaf-900 text-white">All</button>
+      <button type="button" onclick="filterCat('Soaps')" class="cat-btn px-4 py-2 rounded-full text-sm font-semibold bg-leaf-100 text-leaf-950 hover:bg-leaf-900 hover:text-white transition">Soaps</button>
+      <button type="button" onclick="filterCat('Gels')" class="cat-btn px-4 py-2 rounded-full text-sm font-semibold bg-leaf-100 text-leaf-950 hover:bg-leaf-900 hover:text-white transition">Gels</button>
+      <button type="button" onclick="filterCat('Serums')" class="cat-btn px-4 py-2 rounded-full text-sm font-semibold bg-leaf-100 text-leaf-950 hover:bg-leaf-900 hover:text-white transition">Serums</button>
+      <button type="button" onclick="filterCat('Hair Care')" class="cat-btn px-4 py-2 rounded-full text-sm font-semibold bg-leaf-100 text-leaf-950 hover:bg-leaf-900 hover:text-white transition">Hair Care</button>
+      <button type="button" onclick="filterCat('Foods')" class="cat-btn px-4 py-2 rounded-full text-sm font-semibold bg-leaf-100 text-leaf-950 hover:bg-leaf-900 hover:text-white transition">Foods</button>
+    </div>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section id="products" class="py-14 md:py-20 bg-leaf-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="text-center mb-10">
+        <h2 class="font-display text-3xl sm:text-4xl font-bold text-leaf-950 mb-2">Our Products</h2>
+        <p class="text-leaf-950/60">Natural · Herbal · Chemical-free — enquire for price &amp; availability</p>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" id="productGrid"></div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="py-14 md:py-20 bg-white">
+    <div class="max-w-3xl mx-auto px-4 text-center">
+      <h2 class="font-display text-3xl font-bold text-leaf-950 mb-4">About Chandrila</h2>
+      <p class="text-leaf-950/70 leading-relaxed mb-6">
+        We are a small-batch natural beauty and wellness brand rooted in traditional Indian herbal wisdom.
+        Every product is crafted with care — 100% natural, paraben-free, and sulphate-free.
+      </p>
+      <div class="grid sm:grid-cols-3 gap-4 text-sm">
+        <div class="bg-leaf-50 rounded-xl p-5 border border-leaf-100">
+          <div class="text-2xl mb-2">🌿</div>
+          <div class="font-semibold text-leaf-950">Pure Ingredients</div>
+        </div>
+        <div class="bg-leaf-50 rounded-xl p-5 border border-leaf-100">
+          <div class="text-2xl mb-2">🧪</div>
+          <div class="font-semibold text-leaf-950">Cold Processed</div>
+        </div>
+        <div class="bg-leaf-50 rounded-xl p-5 border border-leaf-100">
+          <div class="text-2xl mb-2">🌾</div>
+          <div class="font-semibold text-leaf-950">Wholesome Foods</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEEDBACKS -->
+  <section id="feedbacks" class="py-14 md:py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="text-center mb-10">
+        <h2 class="font-display text-3xl sm:text-4xl font-bold text-leaf-950 mb-2">Customer Love</h2>
+        <p class="text-leaf-950/60">WhatsApp feedbacks from our customers</p>
+      </div>
+      <div class="fb-grid" id="publicFeedbacks"></div>
+      <p id="fbEmpty" class="text-center text-leaf-950/50 text-sm hidden">Feedback screenshots will appear here once admin uploads them.</p>
+    </div>
+  </section>
+
+  <!-- ENQUIRE -->
+  <section id="enquire" class="py-14 md:py-20 bg-leaf-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="text-center mb-10">
+        <h2 class="font-display text-3xl sm:text-4xl font-bold text-leaf-950 mb-2">Product Enquiry</h2>
+        <p class="text-leaf-950/60">Tell us what you need — retail, bulk or custom. We’ll reply on WhatsApp.</p>
+      </div>
+      <div class="grid lg:grid-cols-5 gap-8">
+        <div class="lg:col-span-3 bg-white rounded-2xl border border-leaf-100 p-6 sm:p-8 shadow-sm">
+          <form id="enqForm" class="space-y-4" onsubmit="submitEnquiry(event)">
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-semibold text-leaf-950 mb-1">Name *</label>
+                <input id="enqName" required class="w-full px-4 py-2.5 rounded-xl border border-leaf-100 focus:ring-2 focus:ring-leaf-900/20 outline-none text-sm" placeholder="Your name" />
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-leaf-950 mb-1">Phone *</label>
+                <input id="enqPhone" required type="tel" class="w-full px-4 py-2.5 rounded-xl border border-leaf-100 focus:ring-2 focus:ring-leaf-900/20 outline-none text-sm" placeholder="10-digit mobile" />
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-leaf-950 mb-1">Product interest *</label>
+              <select id="enqProduct" required class="w-full px-4 py-2.5 rounded-xl border border-leaf-100 bg-white outline-none text-sm">
+                <option value="">Select product</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-leaf-950 mb-1">Quantity / requirement</label>
+              <input id="enqQty" class="w-full px-4 py-2.5 rounded-xl border border-leaf-100 outline-none text-sm" placeholder="e.g. 2 packs / 50 units wholesale" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-leaf-950 mb-1">Message</label>
+              <textarea id="enqMsg" rows="3" class="w-full px-4 py-2.5 rounded-xl border border-leaf-100 outline-none text-sm resize-none" placeholder="City, delivery preference, any questions..."></textarea>
+            </div>
+            <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-[#25D366] hover:bg-[#1ebe57] text-white font-semibold shadow transition">
+              Send on WhatsApp
+            </button>
+            <p id="enqStatus" class="text-sm hidden"></p>
+          </form>
+        </div>
+        <div class="lg:col-span-2 space-y-4">
+          <div class="bg-leaf-900 text-white rounded-2xl p-6">
+            <h3 class="font-display text-xl font-bold mb-4">Contact</h3>
+            <div class="space-y-3 text-sm">
+              <div>
+                <div class="text-white/50 text-xs uppercase tracking-wider mb-0.5">Phone / WhatsApp</div>
+                <a id="contactPhone" href="tel:+917339516699" class="hover:underline">+91 73395 16699</a>
+              </div>
+              <div>
+                <div class="text-white/50 text-xs uppercase tracking-wider mb-0.5">Email</div>
+                <a id="contactEmail" href="mailto:hello@chandrila.in" class="hover:underline">hello@chandrila.in</a>
+              </div>
+              <div>
+                <div class="text-white/50 text-xs uppercase tracking-wider mb-0.5">Based in</div>
+                <p id="contactAddress" class="text-white/80">Tamil Nadu, India · Pan India enquiry welcome</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white border border-leaf-100 rounded-2xl p-5 text-sm text-leaf-950/70 leading-relaxed">
+            <strong class="text-leaf-950">No online payment on site.</strong> Share your requirement — we confirm product, price and delivery on WhatsApp.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-leaf-900 text-white pt-12 pb-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="grid sm:grid-cols-3 gap-8 mb-10">
+        <div>
+          <div class="font-display text-2xl font-bold mb-1">CHANDRILA</div>
+          <p class="text-white/50 text-sm">Natural beauty &amp; wellness. Enquire for products and bulk orders.</p>
+        </div>
+        <div>
+          <h4 class="text-sm font-bold uppercase tracking-wider text-white/40 mb-3">Links</h4>
+          <ul class="space-y-2 text-sm text-white/70">
+            <li><a href="#home" class="hover:text-white">Home</a></li>
+            <li><a href="#products" class="hover:text-white">Products</a></li>
+            <li><a href="#enquire" class="hover:text-white">Enquire</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-sm font-bold uppercase tracking-wider text-white/40 mb-3">Note</h4>
+          <p class="text-white/50 text-sm leading-relaxed">For general wellness support. Not a medical substitute. Patch-test recommended.</p>
+        </div>
+      </div>
+      <div class="border-t border-white/10 pt-6 text-sm text-white/40 flex flex-col sm:flex-row justify-between gap-2">
+        <span>© 2026 Chandrila. All rights reserved.</span>
+        <span>www.chandrila.in</span>
+      </div>
+    </div>
+  </footer>
+
+  </div><!-- /publicSite -->
+
+  <!-- ADMIN PANEL -->
+  <div id="adminPanel">
+    <div class="admin-wrap">
+      <div id="admin-dash" class="admin-section">
+        <h2 class="font-display text-2xl font-bold text-leaf-950 mb-5">Dashboard</h2>
+        <div class="admin-grid" id="dashStats"></div>
+        <div class="admin-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+            <h3 style="margin:0">Recent Enquiries</h3>
+            <button type="button" class="btn-a danger" onclick="resetEnquiries()">Reset All</button>
+          </div>
+          <div id="dashRecent"></div>
+        </div>
+      </div>
+      <div id="admin-enquiries" class="admin-section" style="display:none">
+        <h2 class="font-display text-2xl font-bold text-leaf-950 mb-5">Enquiries</h2>
+        <div id="enqList"></div>
+      </div>
+      <div id="admin-products" class="admin-section" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+          <h2 class="font-display text-2xl font-bold text-leaf-950">Products</h2>
+          <button type="button" class="btn-a gold" onclick="openProductModal()">+ Add Product</button>
+        </div>
+        <div class="admin-card" style="overflow-x:auto">
+          <table class="admin-table">
+            <thead><tr><th>Name</th><th>Category</th><th>Price note</th><th>Status</th><th></th></tr></thead>
+            <tbody id="productsTable"></tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div id="admin-feedbacks" class="admin-section" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+          <h2 class="font-display text-2xl font-bold text-leaf-950">WhatsApp Feedbacks</h2>
+          <button type="button" class="btn-a gold" onclick="openFbModal()">+ Upload Screenshot</button>
+        </div>
+        <p style="font-size:.85rem;color:#4d6b56;margin-bottom:14px">Upload customer feedback screenshots from WhatsApp. They show on the public site under Customer Love.</p>
+        <div id="adminFbList"></div>
+      </div>
+
+      <div id="admin-settings" class="admin-section" style="display:none">
+        <h2 class="font-display text-2xl font-bold text-leaf-950 mb-5">Settings</h2>
+        <div class="admin-card" style="max-width:520px">
+          <div class="field"><label>Store name</label><input id="setName" type="text"></div>
+          <div class="field"><label>Phone</label><input id="setPhone" type="text"></div>
+          <div class="field"><label>WhatsApp (no +)</label><input id="setWa" type="text" placeholder="917339516699"></div>
+          <div class="field"><label>Email</label><input id="setEmail" type="email"></div>
+          <div class="field"><label>Address</label><textarea id="setAddress" rows="2"></textarea></div>
+          <button type="button" class="btn-a primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+        <div class="admin-card" style="max-width:520px;margin-top:12px">
+          <h3>Admin password</h3>
+          <div class="field"><label>New password</label><input id="setPass" type="password" placeholder="Min 4 characters"></div>
+          <button type="button" class="btn-a primary" onclick="savePassword()">Update Password</button>
+          <p style="font-size:.75rem;color:#4d6b56;margin-top:10px">Default: admin / admin123 · Open via ?admin=1 or logo 5× click</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="loginModal">
+    <div class="modal-box">
+      <h3 class="font-display text-xl font-bold text-leaf-950 mb-1">Admin Login</h3>
+      <p style="font-size:.85rem;color:#4d6b56;margin-bottom:16px">Chandrila</p>
+      <div class="field"><label>Username</label><input id="loginUser" type="text"></div>
+      <div class="field"><label>Password</label><input id="loginPass" type="password"></div>
+      <p id="loginErr" style="color:#b91c1c;font-size:.85rem;display:none;margin-bottom:8px"></p>
+      <button type="button" class="btn-a primary" style="width:100%;padding:12px" onclick="adminLogin()">Sign In</button>
+      <button type="button" class="btn-a" style="width:100%;margin-top:8px" onclick="closeLogin()">Cancel</button>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="productModal">
+    <div class="modal-box">
+      <h3 class="font-display text-xl font-bold text-leaf-950 mb-4" id="pModalTitle">Add Product</h3>
+      <input type="hidden" id="pId">
+      <div class="field"><label>Name</label><input id="pName" type="text"></div>
+      <div class="field"><label>Short name</label><input id="pShort" type="text"></div>
+      <div class="field"><label>Category</label>
+        <select id="pCat">
+          <option>Soaps</option>
+          <option>Gels</option>
+          <option>Serums</option>
+          <option>Lip Care</option>
+          <option>Hair Care</option>
+          <option>Foods</option>
+        </select>
+      </div>
+      <div class="field"><label>Description</label><textarea id="pDesc" rows="2"></textarea></div>
+      <div class="field"><label>Price note (optional)</label><input id="pPrice" type="text" placeholder="e.g. ₹120 / Enquire"></div>
+      <div class="field"><label>Emoji (fallback if no photo)</label><input id="pEmoji" type="text" placeholder="🧼"></div>
+      <div class="field"><label>Product photo</label>
+        <div class="img-upload-box" onclick="document.getElementById('pImageFile').click()">
+          <div style="font-size:.85rem;color:#4d6b56">📸 Click to upload image</div>
+          <input id="pImageFile" type="file" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handleProductImage(event)">
+        </div>
+        <img id="pImagePreview" class="img-preview" style="display:none" alt="">
+        <input type="hidden" id="pImageData">
+        <button type="button" class="btn-a" style="margin-top:8px" onclick="clearProductImage()">Remove photo</button>
+      </div>
+      <div class="field"><label>Badge</label><input id="pBadge" type="text" placeholder="100% Natural"></div>
+      <div class="field"><label>Status</label><select id="pStatus"><option>Active</option><option>Hidden</option></select></div>
+      <div style="display:flex;gap:8px">
+        <button type="button" class="btn-a primary" onclick="saveProduct()">Save</button>
+        <button type="button" class="btn-a" onclick="closeProductModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal-bg" id="fbModal">
+    <div class="modal-box">
+      <h3 class="font-display text-xl font-bold text-leaf-950 mb-4">Upload Feedback Screenshot</h3>
+      <div class="field"><label>Customer name (optional)</label><input id="fbName" type="text" placeholder="Priya / Customer"></div>
+      <div class="field"><label>Caption (optional)</label><input id="fbCaption" type="text" placeholder="Loved the soap..."></div>
+      <div class="field"><label>WhatsApp screenshot *</label>
+        <div class="img-upload-box" onclick="document.getElementById('fbImageFile').click()">
+          <div style="font-size:.85rem;color:#4d6b56">📸 Upload screenshot</div>
+          <input id="fbImageFile" type="file" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handleFbImage(event)">
+        </div>
+        <img id="fbImagePreview" class="img-preview" style="display:none" alt="">
+        <input type="hidden" id="fbImageData">
+      </div>
+      <div style="display:flex;gap:8px">
+        <button type="button" class="btn-a primary" onclick="saveFeedback()">Save</button>
+        <button type="button" class="btn-a" onclick="closeFbModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const K = {
+      enquiries: 'ch_enq_list',
+      products: 'ch_enq_products',
+      feedbacks: 'ch_enq_feedbacks',
+      settings: 'ch_enq_settings',
+      pass: 'ch_enq_pass',
+      session: 'ch_enq_session'
+    };
+
+    const DEFAULT_PRODUCTS = [
+      {id:1, name:'Nalangu Mavu / Ubtan Soap (Men & Women)', short:'Nalangu Mavu Soap', category:'Soaps', desc:'Cold processed herbal soap for men & women', price:'₹120', emoji:'🧼', badge:'100% Natural', status:'Active'},
+      {id:2, name:'Pure Saffron Gel for Radiant Skin', short:'Saffron Gel', category:'Gels', desc:'Pure saffron gel for radiant skin', price:'₹350', emoji:'🧴', badge:'', status:'Active'},
+      {id:3, name:'Advanced Anti-Aging Face Serum', short:'Anti-Aging Serum', category:'Serums', desc:'Advanced anti-aging face serum', price:'₹480', emoji:'✨', badge:'', status:'Active'},
+      {id:4, name:'Hydrating Chocolate Lip Balm', short:'Chocolate Lipbalm', category:'Lip Care', desc:'Hydrating chocolate lip balm', price:'₹90', emoji:'💄', badge:'', status:'Active'},
+      {id:5, name:'Traditional Shikakai Herbal Shampoo', short:'Shikakai Shampoo', category:'Hair Care', desc:'Traditional shikakai herbal shampoo', price:'₹210', emoji:'🌿', badge:'', status:'Active'},
+      {id:6, name:'Premium ABC Malt (Apple, Beetroot, Carrot)', short:'ABC Malt', category:'Foods', desc:'Premium ABC malt', price:'₹175', emoji:'🌾', badge:'Healthy', status:'Active'}
+    ];
+
+    const DEFAULT_SETTINGS = {
+      name: 'CHANDRILA',
+      phone: '+91 73395 16699',
+      wa: '917339516699',
+      email: 'hello@chandrila.in',
+      address: 'Tamil Nadu, India · Pan India enquiry welcome'
+    };
+
+    let enquiries = [], products = [], feedbacks = [], settings = {}, currentCat = 'all';
+
+    function esc(s) {
+      return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function loadAll() {
+      try { enquiries = JSON.parse(localStorage.getItem(K.enquiries)) || []; } catch(e) { enquiries = []; }
+      try { products = JSON.parse(localStorage.getItem(K.products)) || DEFAULT_PRODUCTS.slice(); } catch(e) { products = DEFAULT_PRODUCTS.slice(); }
+      try { feedbacks = JSON.parse(localStorage.getItem(K.feedbacks)) || []; } catch(e) { feedbacks = []; }
+      try { settings = JSON.parse(localStorage.getItem(K.settings)) || Object.assign({}, DEFAULT_SETTINGS); } catch(e) { settings = Object.assign({}, DEFAULT_SETTINGS); }
+      if (!localStorage.getItem(K.pass)) localStorage.setItem(K.pass, 'admin123');
+      applySettings();
+      renderProducts();
+      fillProductSelect();
+      renderPublicFeedbacks();
+    }
+
+    function applySettings() {
+      const wa = settings.wa || '917339516699';
+      document.querySelectorAll('#headerWa, a[href*="wa.me"]').forEach(a => {
+        if (a.id === 'headerWa' || a.href.includes('wa.me')) a.href = 'https://wa.me/' + wa;
+      });
+      const ph = document.getElementById('contactPhone');
+      if (ph) { ph.href = 'tel:' + (settings.phone||'').replace(/\s/g,''); ph.textContent = settings.phone || ph.textContent; }
+      const em = document.getElementById('contactEmail');
+      if (em) { em.href = 'mailto:' + (settings.email||''); em.textContent = settings.email || em.textContent; }
+      const ad = document.getElementById('contactAddress');
+      if (ad) ad.textContent = settings.address || ad.textContent;
+    }
+
+    function fillProductSelect() {
+      const sel = document.getElementById('enqProduct');
+      if (!sel) return;
+      const active = products.filter(p => p.status === 'Active');
+      sel.innerHTML = '<option value="">Select product</option>' +
+        active.map(p => `<option value="${esc(p.name)}">${esc(p.short || p.name)}</option>`).join('') +
+        '<option value="Mixed / Bulk order">Mixed / Bulk order</option>';
+    }
+
+
+    function compressImage(file, maxW, quality) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => {
+            let w = img.width, h = img.height;
+            if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+            const c = document.createElement('canvas');
+            c.width = w; c.height = h;
+            c.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve(c.toDataURL('image/jpeg', quality));
+          };
+          img.onerror = reject;
+          img.src = reader.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function handleProductImage(e) {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      try {
+        const data = await compressImage(f, 640, 0.72);
+        document.getElementById('pImageData').value = data;
+        const prev = document.getElementById('pImagePreview');
+        prev.src = data;
+        prev.style.display = 'block';
+      } catch (err) { alert('Image load failed'); }
+    }
+    function clearProductImage() {
+      document.getElementById('pImageData').value = '';
+      document.getElementById('pImagePreview').style.display = 'none';
+      document.getElementById('pImagePreview').src = '';
+      document.getElementById('pImageFile').value = '';
+    }
+
+    async function handleFbImage(e) {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      try {
+        const data = await compressImage(f, 720, 0.75);
+        document.getElementById('fbImageData').value = data;
+        const prev = document.getElementById('fbImagePreview');
+        prev.src = data;
+        prev.style.display = 'block';
+      } catch (err) { alert('Image load failed'); }
+    }
+
+    function filterCat(cat) {
+      currentCat = cat;
+      document.querySelectorAll('.cat-btn').forEach(b => {
+        const on = (cat === 'all' && b.textContent.trim() === 'All') || b.textContent.trim() === cat;
+        b.className = 'cat-btn px-4 py-2 rounded-full text-sm font-semibold transition ' +
+          (on ? 'bg-leaf-900 text-white' : 'bg-leaf-100 text-leaf-950 hover:bg-leaf-900 hover:text-white');
+      });
+      renderProducts();
+    }
+
+    function renderProducts() {
+      const grid = document.getElementById('productGrid');
+      let list = products.filter(p => p.status === 'Active');
+      if (currentCat !== 'all') list = list.filter(p => p.category === currentCat);
+      grid.innerHTML = list.map(p => `
+        <article class="product-card bg-white rounded-2xl border border-leaf-100 overflow-hidden shadow-sm">
+          <div class="h-44 bg-gradient-to-br from-leaf-100 to-leaf-50 flex flex-col items-center justify-center relative overflow-hidden">
+            ${p.image ? `<img src="${p.image}" alt="" style="width:100%;height:100%;object-fit:cover">` : `<span class="text-5xl">${p.emoji || '🌿'}</span>`}
+            ${p.badge ? `<span class="absolute top-3 left-3 text-[10px] font-bold uppercase bg-leaf-900 text-white px-2 py-1 rounded-full">${esc(p.badge)}</span>` : ''}
+          </div>
+          <div class="p-5">
+            <div class="text-[11px] uppercase tracking-wider text-leaf-900/50 font-semibold mb-1">${esc(p.category)}</div>
+            <h3 class="font-semibold text-leaf-950 mb-1">${esc(p.short || p.name)}</h3>
+            <p class="text-sm text-leaf-950/60 mb-3 line-clamp-2">${esc(p.desc || '')}</p>
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-bold text-leaf-900">${esc(p.price || 'Enquire')}</span>
+              <button type="button" onclick="enquireProduct('${String(p.name).replace(/'/g,"\\'")}')" class="text-sm font-semibold px-4 py-2 rounded-full bg-leaf-900 text-white hover:bg-leaf-800 transition">Enquire</button>
+            </div>
+          </div>
+        </article>`).join('') || '<p class="col-span-full text-center text-leaf-950/50">No products in this category.</p>';
+    }
+
+    function enquireProduct(name) {
+      const sel = document.getElementById('enqProduct');
+      if (sel) {
+        let found = false;
+        for (const o of sel.options) { if (o.value === name) { sel.value = name; found = true; break; } }
+        if (!found) {
+          const opt = document.createElement('option');
+          opt.value = name; opt.textContent = name; sel.appendChild(opt); sel.value = name;
+        }
+      }
+      document.getElementById('enquire').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function submitEnquiry(e) {
+      e.preventDefault();
+      const name = document.getElementById('enqName').value.trim();
+      const phone = document.getElementById('enqPhone').value.trim();
+      const product = document.getElementById('enqProduct').value.trim();
+      const qty = document.getElementById('enqQty').value.trim();
+      const message = document.getElementById('enqMsg').value.trim();
+      const digits = phone.replace(/\D/g,'').slice(-10);
+      if (!/^\d{10}$/.test(digits)) { alert('Enter valid 10-digit phone'); return; }
+
+      const row = {
+        id: 'ENQ' + Date.now(),
+        name, phone: digits, product, qty, message,
+        status: 'new',
+        createdAt: new Date().toISOString()
+      };
+      enquiries.unshift(row);
+      localStorage.setItem(K.enquiries, JSON.stringify(enquiries));
+
+      const wa = settings.wa || '917339516699';
+      let msg = '🌿 *Chandrila Enquiry*%0A%0A';
+      msg += '*ID:* ' + row.id + '%0A';
+      msg += '*Name:* ' + encodeURIComponent(name) + '%0A';
+      msg += '*Phone:* ' + encodeURIComponent(digits) + '%0A';
+      msg += '*Product:* ' + encodeURIComponent(product) + '%0A';
+      if (qty) msg += '*Qty:* ' + encodeURIComponent(qty) + '%0A';
+      if (message) msg += '*Message:* ' + encodeURIComponent(message);
+      window.open('https://wa.me/' + wa + '?text=' + msg, '_blank');
+
+      const st = document.getElementById('enqStatus');
+      st.className = 'text-sm text-green-700';
+      st.textContent = 'Enquiry saved. WhatsApp opened — send the message to complete.';
+      st.classList.remove('hidden');
+      e.target.reset();
+    }
+
+    // ——— Admin ———
+    function openLogin() {
+      document.getElementById('loginModal').classList.add('show');
+      document.getElementById('loginErr').style.display = 'none';
+    }
+    function closeLogin() { document.getElementById('loginModal').classList.remove('show'); }
+    function adminLogin() {
+      const u = document.getElementById('loginUser').value.trim();
+      const p = document.getElementById('loginPass').value;
+      if (u === 'admin' && p === (localStorage.getItem(K.pass) || 'admin123')) {
+        localStorage.setItem(K.session, '1');
+        closeLogin();
+        enterAdmin();
+      } else {
+        const err = document.getElementById('loginErr');
+        err.textContent = 'Invalid login';
+        err.style.display = 'block';
+      }
+    }
+    function adminLogout() {
+      localStorage.removeItem(K.session);
+      document.getElementById('adminBar').classList.remove('show');
+      document.getElementById('adminPanel').classList.remove('show');
+      document.getElementById('publicSite').classList.remove('hide');
+    }
+    function enterAdmin() {
+      document.getElementById('adminBar').classList.add('show');
+      document.getElementById('adminPanel').classList.add('show');
+      document.getElementById('publicSite').classList.add('hide');
+      showAdminTab('dash');
+    }
+    function exitAdmin() {
+      document.getElementById('adminPanel').classList.remove('show');
+      document.getElementById('publicSite').classList.remove('hide');
+    }
+
+    function showAdminTab(tab) {
+      document.querySelectorAll('.admin-section').forEach(el => el.style.display = 'none');
+      const el = document.getElementById('admin-' + tab);
+      if (el) el.style.display = 'block';
+      document.querySelectorAll('.admin-bar button[data-tab]').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-tab') === tab);
+      });
+      if (tab === 'dash') renderDash();
+      if (tab === 'enquiries') renderEnquiries();
+      if (tab === 'products') renderProductsTable();
+      if (tab === 'feedbacks') renderAdminFeedbacks();
+      if (tab === 'settings') fillSettings();
+    }
+
+    function statusBadge(st) {
+      if (st === 'new') return '<span class="badge badge-new">New</span>';
+      if (st === 'done') return '<span class="badge badge-done">Done</span>';
+      if (st === 'rejected') return '<span class="badge badge-rejected">Rejected</span>';
+      return '<span class="badge badge-pending">' + esc(st) + '</span>';
+    }
+
+    function enqCard(o) {
+      const date = new Date(o.createdAt).toLocaleString();
+      return `<div class="enq-item">
+        <div class="meta">${date} · ${statusBadge(o.status)} · ${esc(o.id)}</div>
+        <div style="font-weight:700">${esc(o.name)} · ${esc(o.phone)}</div>
+        <div style="font-size:.85rem;color:#4d6b56;margin-top:4px">${esc(o.product)}${o.qty ? ' · ' + esc(o.qty) : ''}</div>
+        ${o.message ? `<div style="font-size:.85rem;margin-top:6px">${esc(o.message)}</div>` : ''}
+        <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">
+          <button type="button" class="btn-a ok" onclick="setEnq('${o.id}','done')">Done</button>
+          <button type="button" class="btn-a" onclick="setEnq('${o.id}','pending')">Pending</button>
+          <button type="button" class="btn-a danger" onclick="setEnq('${o.id}','rejected')">Reject</button>
+          <a class="btn-a gold" target="_blank" href="https://wa.me/91${o.phone}?text=${encodeURIComponent('Hi '+o.name+', regarding your Chandrila enquiry '+o.id+'...')}">WhatsApp</a>
+          <button type="button" class="btn-a danger" onclick="delEnq('${o.id}')">Delete</button>
+        </div>
+      </div>`;
+    }
+
+    function renderDash() {
+      const neu = enquiries.filter(e => e.status === 'new').length;
+      document.getElementById('dashStats').innerHTML = `
+        <div class="admin-stat"><div class="n">${enquiries.length}</div><div class="l">Total Enquiries</div></div>
+        <div class="admin-stat"><div class="n">${neu}</div><div class="l">New</div></div>
+        <div class="admin-stat"><div class="n">${products.filter(p=>p.status==='Active').length}</div><div class="l">Active Products</div></div>
+        <div class="admin-stat"><div class="n">${products.length}</div><div class="l">All Products</div></div>
+        <div class="admin-stat"><div class="n">${feedbacks.length}</div><div class="l">Feedbacks</div></div>`;
+      const recent = enquiries.slice(0, 5);
+      document.getElementById('dashRecent').innerHTML = recent.length ? recent.map(enqCard).join('') : '<p style="font-size:.9rem;color:#4d6b56">No enquiries yet.</p>';
+    }
+
+    function renderEnquiries() {
+      document.getElementById('enqList').innerHTML = enquiries.length
+        ? enquiries.map(enqCard).join('')
+        : '<p style="color:#4d6b56">No enquiries yet.</p>';
+    }
+
+    function setEnq(id, st) {
+      enquiries = enquiries.map(e => e.id === id ? Object.assign({}, e, {status: st}) : e);
+      localStorage.setItem(K.enquiries, JSON.stringify(enquiries));
+      renderEnquiries(); renderDash();
+    }
+    function delEnq(id) {
+      if (!confirm('Delete enquiry?')) return;
+      enquiries = enquiries.filter(e => e.id !== id);
+      localStorage.setItem(K.enquiries, JSON.stringify(enquiries));
+      renderEnquiries(); renderDash();
+    }
+    function resetEnquiries() {
+      const pw = prompt('Admin password to reset all enquiries:');
+      if (pw === null) return;
+      if (pw !== (localStorage.getItem(K.pass) || 'admin123')) return alert('Wrong password');
+      if (!confirm('Delete ALL enquiries?')) return;
+      enquiries = [];
+      localStorage.setItem(K.enquiries, JSON.stringify(enquiries));
+      renderDash(); renderEnquiries();
+    }
+
+    function renderProductsTable() {
+      document.getElementById('productsTable').innerHTML = products.map(p => `<tr>
+        <td>${esc(p.short || p.name)}</td>
+        <td>${esc(p.category)}</td>
+        <td>${esc(p.price)}</td>
+        <td>${esc(p.status)}</td>
+        <td style="white-space:nowrap">
+          <button type="button" class="btn-a" onclick="editProduct(${p.id})">Edit</button>
+          <button type="button" class="btn-a danger" onclick="deleteProduct(${p.id})">Del</button>
+        </td>
+      </tr>`).join('');
+    }
+
+    function openProductModal(p) {
+      document.getElementById('productModal').classList.add('show');
+      document.getElementById('pModalTitle').textContent = p ? 'Edit Product' : 'Add Product';
+      document.getElementById('pId').value = p ? p.id : '';
+      document.getElementById('pName').value = p ? p.name : '';
+      document.getElementById('pShort').value = p ? p.short : '';
+      document.getElementById('pCat').value = p ? p.category : 'Soaps';
+      document.getElementById('pDesc').value = p ? p.desc : '';
+      document.getElementById('pPrice').value = p ? p.price : '';
+      document.getElementById('pEmoji').value = p ? p.emoji : '🌿';
+      document.getElementById('pBadge').value = p ? p.badge : '';
+      document.getElementById('pStatus').value = p ? p.status : 'Active';
+      const imgData = p && p.image ? p.image : '';
+      document.getElementById('pImageData').value = imgData;
+      const prev = document.getElementById('pImagePreview');
+      if (imgData) { prev.src = imgData; prev.style.display = 'block'; }
+      else { prev.src = ''; prev.style.display = 'none'; }
+      document.getElementById('pImageFile').value = '';
+    }
+    function closeProductModal() { document.getElementById('productModal').classList.remove('show'); }
+    function editProduct(id) {
+      const p = products.find(x => x.id === id);
+      if (p) openProductModal(p);
+    }
+    function saveProduct() {
+      const id = document.getElementById('pId').value;
+      const row = {
+        id: id ? Number(id) : Date.now(),
+        name: document.getElementById('pName').value.trim(),
+        short: document.getElementById('pShort').value.trim(),
+        category: document.getElementById('pCat').value,
+        desc: document.getElementById('pDesc').value.trim(),
+        price: document.getElementById('pPrice').value.trim(),
+        emoji: document.getElementById('pEmoji').value.trim() || '🌿',
+        badge: document.getElementById('pBadge').value.trim(),
+        status: document.getElementById('pStatus').value,
+        image: document.getElementById('pImageData').value || null
+      };
+      if (!row.name) return alert('Enter name');
+      if (id) products = products.map(p => p.id === row.id ? row : p);
+      else products.push(row);
+      localStorage.setItem(K.products, JSON.stringify(products));
+      closeProductModal();
+      renderProductsTable();
+      renderProducts();
+      fillProductSelect();
+      renderDash();
+    }
+    function deleteProduct(id) {
+      if (!confirm('Delete product?')) return;
+      products = products.filter(p => p.id !== id);
+      localStorage.setItem(K.products, JSON.stringify(products));
+      renderProductsTable();
+      renderProducts();
+      fillProductSelect();
+      renderDash();
+    }
+
+
+    function renderPublicFeedbacks() {
+      const grid = document.getElementById('publicFeedbacks');
+      const empty = document.getElementById('fbEmpty');
+      if (!grid) return;
+      if (!feedbacks.length) {
+        grid.innerHTML = '';
+        if (empty) empty.classList.remove('hidden');
+        return;
+      }
+      if (empty) empty.classList.add('hidden');
+      grid.innerHTML = feedbacks.map(f => `
+        <div class="fb-card">
+          <img src="${f.image}" alt="Customer feedback">
+          <div class="fb-body">
+            ${f.name ? `<div style="font-weight:700;font-size:.9rem;color:#0f3d1c">${esc(f.name)}</div>` : ''}
+            ${f.caption ? `<div style="font-size:.85rem;color:#4d6b56;margin-top:4px">${esc(f.caption)}</div>` : ''}
+          </div>
+        </div>`).join('');
+    }
+
+    function renderAdminFeedbacks() {
+      const el = document.getElementById('adminFbList');
+      if (!feedbacks.length) {
+        el.innerHTML = '<p style="color:#4d6b56;font-size:.9rem">No feedback screenshots yet.</p>';
+        return;
+      }
+      el.innerHTML = feedbacks.map(f => `
+        <div class="enq-item" style="display:flex;gap:12px;align-items:flex-start">
+          <img src="${f.image}" alt="" style="width:80px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0">
+          <div style="flex:1">
+            <div style="font-weight:700">${esc(f.name || 'Customer')}</div>
+            <div style="font-size:.85rem;color:#4d6b56">${esc(f.caption || '')}</div>
+            <div class="meta" style="margin-top:4px">${new Date(f.createdAt).toLocaleString()}</div>
+            <button type="button" class="btn-a danger" style="margin-top:8px" onclick="deleteFeedback(${f.id})">Delete</button>
+          </div>
+        </div>`).join('');
+    }
+
+    function openFbModal() {
+      document.getElementById('fbModal').classList.add('show');
+      document.getElementById('fbName').value = '';
+      document.getElementById('fbCaption').value = '';
+      document.getElementById('fbImageData').value = '';
+      document.getElementById('fbImagePreview').style.display = 'none';
+      document.getElementById('fbImageFile').value = '';
+    }
+    function closeFbModal() { document.getElementById('fbModal').classList.remove('show'); }
+
+    function saveFeedback() {
+      const image = document.getElementById('fbImageData').value;
+      if (!image) return alert('Upload a screenshot first');
+      feedbacks.unshift({
+        id: Date.now(),
+        name: document.getElementById('fbName').value.trim(),
+        caption: document.getElementById('fbCaption').value.trim(),
+        image,
+        createdAt: new Date().toISOString()
+      });
+      localStorage.setItem(K.feedbacks, JSON.stringify(feedbacks));
+      closeFbModal();
+      renderAdminFeedbacks();
+      renderPublicFeedbacks();
+      renderDash();
+    }
+    function deleteFeedback(id) {
+      if (!confirm('Delete this feedback?')) return;
+      feedbacks = feedbacks.filter(f => f.id !== id);
+      localStorage.setItem(K.feedbacks, JSON.stringify(feedbacks));
+      renderAdminFeedbacks();
+      renderPublicFeedbacks();
+      renderDash();
+    }
+
+    function fillSettings() {
+      document.getElementById('setName').value = settings.name || '';
+      document.getElementById('setPhone').value = settings.phone || '';
+      document.getElementById('setWa').value = settings.wa || '';
+      document.getElementById('setEmail').value = settings.email || '';
+      document.getElementById('setAddress').value = settings.address || '';
+      document.getElementById('setPass').value = '';
+    }
+    function saveSettings() {
+      settings = {
+        name: document.getElementById('setName').value.trim(),
+        phone: document.getElementById('setPhone').value.trim(),
+        wa: document.getElementById('setWa').value.trim(),
+        email: document.getElementById('setEmail').value.trim(),
+        address: document.getElementById('setAddress').value.trim()
+      };
+      localStorage.setItem(K.settings, JSON.stringify(settings));
+      applySettings();
+      alert('Settings saved');
+    }
+    function savePassword() {
+      const p = document.getElementById('setPass').value;
+      if (!p || p.length < 4) return alert('Min 4 characters');
+      localStorage.setItem(K.pass, p);
+      document.getElementById('setPass').value = '';
+      alert('Password updated');
+    }
+
+    // Public UI
+    document.getElementById('mobileBtn').addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.toggle('hidden');
+    });
+    document.getElementById('mobileMenu').querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => document.getElementById('mobileMenu').classList.add('hidden'));
+    });
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('nav-scrolled', window.scrollY > 40);
+    });
+
+    let logoClicks = 0;
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAll();
+      if (localStorage.getItem(K.session) === '1') enterAdmin();
+      if (location.search.includes('admin=1')) openLogin();
+      const logo = document.querySelector('header a[href="#home"]');
+      if (logo) {
+        logo.addEventListener('click', () => {
+          logoClicks++;
+          if (logoClicks >= 5) { logoClicks = 0; openLogin(); }
+          setTimeout(() => { logoClicks = 0; }, 2000);
+        });
+      }
+    });
+  </script>
+</body>
+</html>
