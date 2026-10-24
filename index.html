@@ -32,6 +32,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 88px;
+    }
     body { font-family: 'DM Sans', system-ui, sans-serif; color: #14261a; }
     .font-display { font-family: 'Cormorant Garamond', Georgia, serif; }
     .hero-bg {
@@ -47,9 +51,29 @@
       background: rgba(255,255,255,0.97);
       box-shadow: 0 4px 20px rgba(31,122,58,0.08);
       border-bottom-color: #b8e0c4 !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
     .product-card { transition: transform .25s ease, box-shadow .25s ease; }
     .product-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -12px rgba(31,122,58,0.18); }
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: opacity, transform;
+    }
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+    }
     /* Admin */
     .admin-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:100;background:#1f7a3a;border-bottom:2px solid #c9a227;padding:8px 14px;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
     .admin-bar.show{display:flex}
@@ -155,7 +179,7 @@
   </header>
 
   <!-- HERO -->
-  <section id="home" class="hero-bg pt-24 pb-14 md:pt-32 md:pb-20">
+  <section id="home" class="hero-bg pt-24 pb-14 md:pt-32 md:pb-20 reveal">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center">
       <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-leaf-900/10 border border-leaf-900/20 mb-5">
         <span class="w-2 h-2 rounded-full bg-leaf-900 animate-pulse"></span>
@@ -181,7 +205,7 @@
   </section>
 
   <!-- CATEGORIES -->
-  <section class="py-8 bg-white border-b border-leaf-100">
+  <section class="py-8 bg-white border-b border-leaf-100 reveal">
     <div class="max-w-4xl mx-auto px-4 flex flex-wrap justify-center gap-3 sm:gap-4">
       <button type="button" onclick="filterCat('all')" class="cat-btn px-4 py-2 rounded-full text-sm font-semibold bg-leaf-900 text-white">All</button>
       <button type="button" onclick="filterCat('Soaps')" class="cat-btn px-4 py-2 rounded-full text-sm font-semibold bg-leaf-100 text-leaf-950 hover:bg-leaf-900 hover:text-white transition">Soaps</button>
@@ -193,7 +217,7 @@
   </section>
 
   <!-- PRODUCTS -->
-  <section id="products" class="py-14 md:py-20 bg-leaf-50">
+  <section id="products" class="py-14 md:py-20 bg-leaf-50 reveal">
     <div class="max-w-6xl mx-auto px-4 sm:px-6">
       <div class="text-center mb-10">
         <h2 class="font-display text-3xl sm:text-4xl font-bold text-leaf-950 mb-2">Our Products</h2>
@@ -204,7 +228,7 @@
   </section>
 
   <!-- ABOUT -->
-  <section id="about" class="py-14 md:py-20 bg-white">
+  <section id="about" class="py-14 md:py-20 bg-white reveal">
     <div class="max-w-3xl mx-auto px-4 text-center">
       <h2 class="font-display text-3xl font-bold text-leaf-950 mb-4">About Chandrila</h2>
       <p class="text-leaf-950/70 leading-relaxed mb-6">
@@ -229,7 +253,7 @@
   </section>
 
   <!-- FEEDBACKS -->
-  <section id="feedbacks" class="py-14 md:py-20 bg-white">
+  <section id="feedbacks" class="py-14 md:py-20 bg-white reveal">
     <div class="max-w-6xl mx-auto px-4 sm:px-6">
       <div class="text-center mb-10">
         <h2 class="font-display text-3xl sm:text-4xl font-bold text-leaf-950 mb-2">Customer Love</h2>
@@ -241,7 +265,7 @@
   </section>
 
   <!-- ENQUIRE -->
-  <section id="enquire" class="py-14 md:py-20 bg-leaf-50">
+  <section id="enquire" class="py-14 md:py-20 bg-leaf-50 reveal">
     <div class="max-w-6xl mx-auto px-4 sm:px-6">
       <div class="text-center mb-10">
         <h2 class="font-display text-3xl sm:text-4xl font-bold text-leaf-950 mb-2">Product Enquiry</h2>
@@ -307,7 +331,7 @@
   </section>
 
   <!-- FOOTER -->
-  <footer class="bg-leaf-900 text-white pt-12 pb-8">
+  <footer class="bg-leaf-900 text-white pt-12 pb-8 reveal">
     <div class="max-w-6xl mx-auto px-4 sm:px-6">
       <div class="grid sm:grid-cols-3 gap-8 mb-10">
         <div>
@@ -490,7 +514,7 @@
     window._firebaseReady = true;
     document.dispatchEvent(new Event('firebaseReady'));
   </script>
-  <div id="toast" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0f3d1c;color:#fff;padding:10px 16px;border-radius:10px;z-index:300;font-size:.85rem;max-width:90%;"></div>
+  <div id="toast" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0f3d1c;color:#fff;padding:10px 16px;border-radius:10px;z-index:300;font-size:.85rem;max-width:90vw;text-align:center"></div>
   <script>
     const K = {
       enquiries: 'ch_enq_list',
@@ -522,6 +546,37 @@
 
     function esc(s) {
       return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function initScrollEffects() {
+      const navbar = document.getElementById('navbar');
+      const revealEls = document.querySelectorAll('.reveal');
+
+      const onScroll = () => {
+        if (!navbar) return;
+        navbar.classList.toggle('nav-scrolled', window.scrollY > 10);
+      };
+
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+
+      if ('IntersectionObserver' in window) {
+        const revealObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.14, rootMargin: '0px 0px -8% 0px' });
+
+        revealEls.forEach((el, index) => {
+          el.style.transitionDelay = `${Math.min(index * 80, 240)}ms`;
+          revealObserver.observe(el);
+        });
+      } else {
+        revealEls.forEach(el => el.classList.add('is-visible'));
+      }
     }
 
     function loadAll() {
@@ -579,7 +634,6 @@
           const n = normalizeProduct(d.data());
           if (n) cloudProducts.push(n);
         });
-        // Cloud is source of truth for which products exist (so deletes sync to all devices)
         if (cloudProducts.length) {
           const localById = {};
           products.forEach(p => {
@@ -588,7 +642,6 @@
           });
           products = cloudProducts.map(p => {
             const local = localById[String(p.id)];
-            // Prefer cloud data; keep local image only if cloud has none
             if (local && !p.image && local.image) {
               return Object.assign({}, p, { image: local.image });
             }
@@ -692,7 +745,6 @@
       if (ad) ad.textContent = settings.address || ad.textContent;
     }
 
-
     function mapCategory(cat) {
       const c = (cat || '').toString().trim();
       const low = c.toLowerCase();
@@ -750,7 +802,6 @@
         active.map(p => `<option value="${esc(p.name)}">${esc(p.short || p.name)}</option>`).join('') +
         '<option value="Mixed / Bulk order">Mixed / Bulk order</option>';
     }
-
 
     function compressImage(file, maxW, quality) {
       return new Promise((resolve, reject) => {
@@ -818,7 +869,7 @@
       let list = products.filter(isActiveProduct);
       if (currentCat !== 'all') list = list.filter(p => catMatch(p.category, currentCat));
       grid.innerHTML = list.map(p => `
-        <article class="product-card bg-white rounded-2xl border border-leaf-100 overflow-hidden shadow-sm">
+        <article class="product-card bg-white rounded-2xl border border-leaf-100 overflow-hidden shadow-sm reveal">
           <div class="h-44 bg-gradient-to-br from-leaf-100 to-leaf-50 flex flex-col items-center justify-center relative overflow-hidden">
             ${p.image ? `<img src="${p.image}" alt="" style="width:100%;height:100%;object-fit:cover">` : `<span class="text-5xl">${p.emoji || '🌿'}</span>`}
             ${p.badge ? `<span class="absolute top-3 left-3 text-[10px] font-bold uppercase bg-leaf-900 text-white px-2 py-1 rounded-full">${esc(p.badge)}</span>` : ''}
@@ -829,10 +880,23 @@
             <p class="text-sm text-leaf-950/60 mb-3 line-clamp-2">${esc(p.desc || '')}</p>
             <div class="flex items-center justify-between gap-2">
               <span class="font-bold text-leaf-900">${esc(p.price || 'Enquire')}</span>
-              <button type="button" onclick="enquireProduct('${String(p.name).replace(/'/g,"\\'")}')" class="text-sm font-semibold px-4 py-2 rounded-full bg-leaf-900 text-white hover:bg-leaf-800 transition">Enquire</button>
+              <button type="button" onclick="enquireProduct('${String(p.name).replace(/'/g,"\\'")}' )" class="text-sm font-semibold px-4 py-2 rounded-full bg-leaf-900 text-white hover:bg-leaf-800 transition">Enquire</button>
             </div>
           </div>
         </article>`).join('') || '<p class="col-span-full text-center text-leaf-950/50">No products in this category.</p>';
+      if (window.IntersectionObserver) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('#productGrid .reveal').forEach((card) => observer.observe(card));
+      } else {
+        document.querySelectorAll('#productGrid .reveal').forEach((card) => card.classList.add('is-visible'));
+      }
     }
 
     function enquireProduct(name) {
@@ -885,7 +949,6 @@
       e.target.reset();
     }
 
-    // ——— Admin ———
     function openLogin() {
       document.getElementById('loginModal').classList.add('show');
       document.getElementById('loginErr').style.display = 'none';
@@ -999,179 +1062,108 @@
       localStorage.setItem(K.enquiries, JSON.stringify(enquiries));
       renderEnquiries(); renderDash();
     }
-    function resetEnquiries() {
-      const pw = prompt('Admin password to reset all enquiries:');
-      if (pw === null) return;
-      if (pw !== (localStorage.getItem(K.pass) || 'admin123')) return alert('Wrong password');
-      if (!confirm('Delete ALL enquiries?')) return;
-      enquiries = [];
-      localStorage.setItem(K.enquiries, JSON.stringify(enquiries));
-      renderDash(); renderEnquiries();
-    }
-
-    function renderProductsTable() {
-      document.getElementById('productsTable').innerHTML = products.map(p => `<tr>
-        <td>${esc(p.short || p.name)}</td>
-        <td>${esc(p.category)}</td>
-        <td>${esc(p.price)}</td>
-        <td>${esc(p.status)}</td>
-        <td style="white-space:nowrap">
-          <button type="button" class="btn-a" onclick="editProduct(${p.id})">Edit</button>
-          <button type="button" class="btn-a danger" onclick="deleteProduct(${p.id})">Del</button>
-        </td>
-      </tr>`).join('');
-    }
-
-    function openProductModal(p) {
-      document.getElementById('productModal').classList.add('show');
-      document.getElementById('pModalTitle').textContent = p ? 'Edit Product' : 'Add Product';
-      document.getElementById('pId').value = p ? p.id : '';
-      document.getElementById('pName').value = p ? p.name : '';
-      document.getElementById('pShort').value = p ? p.short : '';
-      document.getElementById('pCat').value = p ? p.category : 'Soaps';
-      document.getElementById('pDesc').value = p ? p.desc : '';
-      document.getElementById('pPrice').value = p ? p.price : '';
-      document.getElementById('pEmoji').value = p ? p.emoji : '🌿';
-      document.getElementById('pBadge').value = p ? p.badge : '';
-      document.getElementById('pStatus').value = p ? p.status : 'Active';
-      const imgData = p && p.image ? p.image : '';
-      document.getElementById('pImageData').value = imgData;
-      const prev = document.getElementById('pImagePreview');
-      if (imgData) { prev.src = imgData; prev.style.display = 'block'; }
-      else { prev.src = ''; prev.style.display = 'none'; }
-      document.getElementById('pImageFile').value = '';
-    }
-    function closeProductModal() { document.getElementById('productModal').classList.remove('show'); }
-    function editProduct(id) {
-      const p = products.find(x => String(x.id) === String(id));
-      if (p) openProductModal(p);
-    }
-    function saveProduct() {
-      const id = document.getElementById('pId').value;
-      const row = {
-        id: id ? Number(id) : Date.now(),
-        name: document.getElementById('pName').value.trim(),
-        short: document.getElementById('pShort').value.trim(),
-        category: document.getElementById('pCat').value,
-        desc: document.getElementById('pDesc').value.trim(),
-        price: document.getElementById('pPrice').value.trim(),
-        emoji: document.getElementById('pEmoji').value.trim() || '🌿',
-        badge: document.getElementById('pBadge').value.trim(),
-        status: document.getElementById('pStatus').value,
-        image: document.getElementById('pImageData').value || null
-      };
-      if (!row.name) return alert('Enter name');
-      if (id) products = products.map(p => String(p.id) === String(row.id) ? row : p);
-      else products.push(row);
-      localStorage.setItem(K.products, JSON.stringify(products));
-      closeProductModal();
-      renderProductsTable();
-      renderProducts();
-      fillProductSelect();
-      renderDash();
-      saveProductsCloud().then(ok => {
-        if (ok) showToast('Product saved on all devices');
-      });
-    }
-    async function deleteProduct(id) {
-      if (!confirm('Delete product?')) return;
-      const sid = String(id);
-      products = products.filter(p => String(p.id) !== sid);
-      localStorage.setItem(K.products, JSON.stringify(products));
-      renderProductsTable();
-      renderProducts();
-      fillProductSelect();
-      renderDash();
-
-      const ok = await waitFirebase();
-      if (!ok || !window._db) {
-        showToast('Deleted on this device only — cloud not ready');
-        return;
-      }
-      try {
-        await window._fsDeleteDoc(window._fsDoc(window._db, 'products', 'p_' + sid));
-        setCloudStatus('Cloud: product deleted');
-        showToast('Product deleted on all devices');
-      } catch (e) {
-        console.error(e);
-        showToast('Cloud delete failed: ' + (e.code || e.message || 'error'));
-      }
-    }
-
 
     function renderPublicFeedbacks() {
       const grid = document.getElementById('publicFeedbacks');
-      const empty = document.getElementById('fbEmpty');
       if (!grid) return;
-      if (!feedbacks.length) {
-        grid.innerHTML = '';
-        if (empty) empty.classList.remove('hidden');
-        return;
-      }
-      if (empty) empty.classList.add('hidden');
-      grid.innerHTML = feedbacks.map(f => `
-        <div class="fb-card">
-          <img src="${f.image}" alt="Customer feedback">
+      grid.innerHTML = feedbacks.length ? feedbacks.map(fb => `
+        <div class="fb-card reveal">
+          <img src="${fb.image || ''}" alt="${esc(fb.name || 'Customer feedback')}" />
           <div class="fb-body">
-            ${f.name ? `<div style="font-weight:700;font-size:.9rem;color:#0f3d1c">${esc(f.name)}</div>` : ''}
-            ${f.caption ? `<div style="font-size:.85rem;color:#4d6b56;margin-top:4px">${esc(f.caption)}</div>` : ''}
+            <div class="font-semibold text-leaf-950">${esc(fb.name || 'Customer')}</div>
+            ${fb.caption ? `<div class="text-sm text-leaf-950/60 mt-1">${esc(fb.caption)}</div>` : ''}
           </div>
-        </div>`).join('');
+        </div>
+      `).join('') : '';
+      document.getElementById('fbEmpty').classList.toggle('hidden', feedbacks.length > 0);
+      if (window.IntersectionObserver) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('#publicFeedbacks .reveal').forEach((el) => observer.observe(el));
+      } else {
+        document.querySelectorAll('#publicFeedbacks .reveal').forEach((el) => el.classList.add('is-visible'));
+      }
+    }
+
+    function renderProductsTable() {
+      const table = document.getElementById('productsTable');
+      if (!table) return;
+      table.innerHTML = products.map(p => `
+        <tr>
+          <td>${esc(p.short || p.name)}</td>
+          <td>${esc(p.category)}</td>
+          <td>${esc(p.price || 'Enquire')}</td>
+          <td>${esc(p.status || 'Active')}</td>
+          <td><button class="btn-a" onclick="editProduct(${p.id})">Edit</button></td>
+        </tr>
+      `).join('');
     }
 
     function renderAdminFeedbacks() {
-      const el = document.getElementById('adminFbList');
-      if (!feedbacks.length) {
-        el.innerHTML = '<p style="color:#4d6b56;font-size:.9rem">No feedback screenshots yet.</p>';
+      const host = document.getElementById('adminFbList');
+      if (!host) return;
+      host.innerHTML = feedbacks.length ? feedbacks.map(fb => `
+        <div class="admin-card">
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+            <div>
+              <div class="font-semibold text-leaf-950">${esc(fb.name || 'Customer')}</div>
+              ${fb.caption ? `<div class="text-sm text-leaf-950/60">${esc(fb.caption)}</div>` : ''}
+            </div>
+            <button class="btn-a danger" onclick="deleteFeedback('${fb.id || fb.name || Math.random()}')">Delete</button>
+          </div>
+          <img src="${fb.image || ''}" alt="" style="width:100%;max-height:220px;object-fit:cover;border-radius:12px;margin-top:12px;border:1px solid #cfe6d4" />
+        </div>
+      `).join('') : '<p style="color:#4d6b56">No feedbacks yet.</p>';
+    }
+
+    function saveFeedback() {
+      const name = document.getElementById('fbName').value.trim();
+      const caption = document.getElementById('fbCaption').value.trim();
+      const image = document.getElementById('fbImageData').value.trim();
+      if (!image) {
+        showToast('Please upload a feedback screenshot');
         return;
       }
-      el.innerHTML = feedbacks.map(f => `
-        <div class="enq-item" style="display:flex;gap:12px;align-items:flex-start">
-          <img src="${f.image}" alt="" style="width:80px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0">
-          <div style="flex:1">
-            <div style="font-weight:700">${esc(f.name || 'Customer')}</div>
-            <div style="font-size:.85rem;color:#4d6b56">${esc(f.caption || '')}</div>
-            <div class="meta" style="margin-top:4px">${new Date(f.createdAt).toLocaleString()}</div>
-            <button type="button" class="btn-a danger" style="margin-top:8px" onclick="deleteFeedback(${f.id})">Delete</button>
-          </div>
-        </div>`).join('');
+      feedbacks.unshift({
+        id: 'FB' + Date.now(),
+        name,
+        caption,
+        image
+      });
+      localStorage.setItem(K.feedbacks, JSON.stringify(feedbacks));
+      saveFeedbacksCloud();
+      renderPublicFeedbacks();
+      renderAdminFeedbacks();
+      closeFbModal();
+      showToast('Feedback saved');
+    }
+
+    function closeFbModal() {
+      document.getElementById('fbModal').classList.remove('show');
+      document.getElementById('fbName').value = '';
+      document.getElementById('fbCaption').value = '';
+      document.getElementById('fbImageData').value = '';
+      document.getElementById('fbImagePreview').src = '';
+      document.getElementById('fbImagePreview').style.display = 'none';
+      document.getElementById('fbImageFile').value = '';
     }
 
     function openFbModal() {
       document.getElementById('fbModal').classList.add('show');
-      document.getElementById('fbName').value = '';
-      document.getElementById('fbCaption').value = '';
-      document.getElementById('fbImageData').value = '';
-      document.getElementById('fbImagePreview').style.display = 'none';
-      document.getElementById('fbImageFile').value = '';
     }
-    function closeFbModal() { document.getElementById('fbModal').classList.remove('show'); }
 
-    function saveFeedback() {
-      const image = document.getElementById('fbImageData').value;
-      if (!image) return alert('Upload a screenshot first');
-      feedbacks.unshift({
-        id: Date.now(),
-        name: document.getElementById('fbName').value.trim(),
-        caption: document.getElementById('fbCaption').value.trim(),
-        image,
-        createdAt: new Date().toISOString()
-      });
-      localStorage.setItem(K.feedbacks, JSON.stringify(feedbacks));
-      closeFbModal();
-      renderAdminFeedbacks();
-      renderPublicFeedbacks();
-      renderDash();
-      saveFeedbacksCloud().then(ok => { if (ok) showToast('Feedback saved on all devices'); });
-    }
     function deleteFeedback(id) {
-      if (!confirm('Delete this feedback?')) return;
-      feedbacks = feedbacks.filter(f => f.id !== id);
+      feedbacks = feedbacks.filter((x) => (x.id || x.name) !== id);
       localStorage.setItem(K.feedbacks, JSON.stringify(feedbacks));
       saveFeedbacksCloud();
-      renderAdminFeedbacks();
       renderPublicFeedbacks();
-      renderDash();
+      renderAdminFeedbacks();
     }
 
     function fillSettings() {
@@ -1180,52 +1172,117 @@
       document.getElementById('setWa').value = settings.wa || '';
       document.getElementById('setEmail').value = settings.email || '';
       document.getElementById('setAddress').value = settings.address || '';
-      document.getElementById('setPass').value = '';
     }
+
     function saveSettings() {
-      settings = {
-        name: document.getElementById('setName').value.trim(),
-        phone: document.getElementById('setPhone').value.trim(),
-        wa: document.getElementById('setWa').value.trim(),
-        email: document.getElementById('setEmail').value.trim(),
-        address: document.getElementById('setAddress').value.trim()
-      };
+      settings.name = document.getElementById('setName').value.trim() || settings.name;
+      settings.phone = document.getElementById('setPhone').value.trim() || settings.phone;
+      settings.wa = document.getElementById('setWa').value.trim() || settings.wa;
+      settings.email = document.getElementById('setEmail').value.trim() || settings.email;
+      settings.address = document.getElementById('setAddress').value.trim() || settings.address;
       localStorage.setItem(K.settings, JSON.stringify(settings));
+      saveSettingsCloud();
       applySettings();
-      saveSettingsCloud().then(ok => alert(ok ? 'Settings saved on all devices' : 'Saved on this device only — cloud failed'));
+      showToast('Settings saved');
     }
+
     function savePassword() {
-      const p = document.getElementById('setPass').value;
-      if (!p || p.length < 4) return alert('Min 4 characters');
-      localStorage.setItem(K.pass, p);
+      const value = document.getElementById('setPass').value.trim();
+      if (value.length < 4) { showToast('Password must be at least 4 characters'); return; }
+      localStorage.setItem(K.pass, value);
+      showToast('Password updated');
       document.getElementById('setPass').value = '';
-      alert('Password updated');
     }
 
-    // Public UI
-    document.getElementById('mobileBtn').addEventListener('click', () => {
-      document.getElementById('mobileMenu').classList.toggle('hidden');
-    });
-    document.getElementById('mobileMenu').querySelectorAll('a').forEach(a => {
-      a.addEventListener('click', () => document.getElementById('mobileMenu').classList.add('hidden'));
-    });
-    window.addEventListener('scroll', () => {
-      document.getElementById('navbar').classList.toggle('nav-scrolled', window.scrollY > 40);
-    });
+    function openProductModal() {
+      document.getElementById('pModalTitle').textContent = 'Add Product';
+      document.getElementById('pId').value = '';
+      document.getElementById('pName').value = '';
+      document.getElementById('pShort').value = '';
+      document.getElementById('pCat').value = 'Soaps';
+      document.getElementById('pDesc').value = '';
+      document.getElementById('pPrice').value = '';
+      document.getElementById('pEmoji').value = '';
+      document.getElementById('pBadge').value = '';
+      document.getElementById('pStatus').value = 'Active';
+      clearProductImage();
+      document.getElementById('productModal').classList.add('show');
+    }
 
-    let logoClicks = 0;
+    function closeProductModal() {
+      document.getElementById('productModal').classList.remove('show');
+    }
+
+    function editProduct(id) {
+      const p = products.find(x => x.id === id);
+      if (!p) return;
+      document.getElementById('pModalTitle').textContent = 'Edit Product';
+      document.getElementById('pId').value = p.id;
+      document.getElementById('pName').value = p.name || '';
+      document.getElementById('pShort').value = p.short || '';
+      document.getElementById('pCat').value = p.category || 'Soaps';
+      document.getElementById('pDesc').value = p.desc || '';
+      document.getElementById('pPrice').value = p.price || '';
+      document.getElementById('pEmoji').value = p.emoji || '';
+      document.getElementById('pBadge').value = p.badge || '';
+      document.getElementById('pStatus').value = p.status || 'Active';
+      document.getElementById('pImageData').value = p.image || '';
+      const prev = document.getElementById('pImagePreview');
+      if (p.image) {
+        prev.src = p.image;
+        prev.style.display = 'block';
+      } else {
+        prev.src = '';
+        prev.style.display = 'none';
+      }
+      document.getElementById('productModal').classList.add('show');
+    }
+
+    function saveProduct() {
+      const id = document.getElementById('pId').value; 
+      const entry = {
+        id: id ? Number(id) : Date.now(),
+        name: document.getElementById('pName').value.trim(),
+        short: document.getElementById('pShort').value.trim() || document.getElementById('pName').value.trim(),
+        category: document.getElementById('pCat').value,
+        desc: document.getElementById('pDesc').value.trim(),
+        price: document.getElementById('pPrice').value.trim(),
+        emoji: document.getElementById('pEmoji').value.trim() || '🌿',
+        badge: document.getElementById('pBadge').value.trim(),
+        status: document.getElementById('pStatus').value,
+        image: document.getElementById('pImageData').value.trim() || null
+      };
+      if (!entry.name) {
+        showToast('Product name is required');
+        return;
+      }
+      const existingIndex = products.findIndex(p => String(p.id) === String(entry.id));
+      if (existingIndex >= 0) {
+        products[existingIndex] = normalizeProduct(entry);
+      } else {
+        products.push(normalizeProduct(entry));
+      }
+      localStorage.setItem(K.products, JSON.stringify(products));
+      saveProductsCloud();
+      renderProducts();
+      fillProductSelect();
+      renderProductsTable();
+      closeProductModal();
+      showToast('Product saved');
+    }
+
+    function resetEnquiries() {
+      if (!confirm('Reset all enquiries?')) return;
+      enquiries = [];
+      localStorage.setItem(K.enquiries, JSON.stringify(enquiries));
+      renderEnquiries();
+      renderDash();
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+      initScrollEffects();
       loadAll();
       if (localStorage.getItem(K.session) === '1') enterAdmin();
-      if (location.search.includes('admin=1')) openLogin();
-      const logo = document.querySelector('header a[href="#home"]');
-      if (logo) {
-        logo.addEventListener('click', () => {
-          logoClicks++;
-          if (logoClicks >= 5) { logoClicks = 0; openLogin(); }
-          setTimeout(() => { logoClicks = 0; }, 2000);
-        });
-      }
     });
   </script>
 </body>
